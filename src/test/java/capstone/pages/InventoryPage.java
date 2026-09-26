@@ -2,13 +2,14 @@ package capstone.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
 
-/** Page Object списку товарів (після успішного логіну). */
+/** Page Object списку товарів (еталонна реалізація). */
 public class InventoryPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -24,22 +25,26 @@ public class InventoryPage {
     }
 
     public InventoryPage waitUntilOpened() {
-        throw new UnsupportedOperationException("TODO: дочекайся, що список товарів зʼявився (ITEMS)");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(ITEMS));
+        return this;
     }
 
     public int itemCount() {
-        throw new UnsupportedOperationException("TODO: поверни кількість товарів на сторінці");
+        return driver.findElements(ITEMS).size();
     }
 
     public InventoryPage addBackpackToCart() {
-        throw new UnsupportedOperationException("TODO: додай рюкзак у кошик");
+        wait.until(ExpectedConditions.elementToBeClickable(ADD_BACKPACK)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(CART_BADGE));
+        return this;
     }
 
     public int cartBadgeCount() {
-        throw new UnsupportedOperationException("TODO: поверни число на бейджі кошика (0, якщо бейджа немає)");
+        List<WebElement> badges = driver.findElements(CART_BADGE);
+        return badges.isEmpty() ? 0 : Integer.parseInt(badges.get(0).getText().trim());
     }
 
     public void openCart() {
-        throw new UnsupportedOperationException("TODO: відкрий кошик");
+        wait.until(ExpectedConditions.elementToBeClickable(CART_LINK)).click();
     }
 }

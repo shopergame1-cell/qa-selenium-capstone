@@ -7,14 +7,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-/**
- * Page Object сторінки логіну Swag Labs (https://www.saucedemo.com/).
- *
- * TODO: реалізуй методи цього Page Object. Правила:
- *  - ніяких Thread.sleep: користуйся WebDriverWait/ExpectedConditions;
- *  - локатори — у константах, не розсипані по тестах;
- *  - методи повертають цей самий обʼєкт або наступну сторінку (fluent-стиль).
- */
+/** Page Object сторінки логіну Swag Labs (еталонна реалізація). */
 public class LoginPage {
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -30,22 +23,26 @@ public class LoginPage {
     }
 
     public LoginPage open() {
-        throw new UnsupportedOperationException("TODO: відкрий https://www.saucedemo.com/ і дочекайся появи поля логіну");
+        driver.get("https://www.saucedemo.com/");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(USERNAME));
+        return this;
     }
 
     public LoginPage typeUsername(String username) {
-        throw new UnsupportedOperationException("TODO: введи логін у поле user-name");
+        wait.until(ExpectedConditions.elementToBeClickable(USERNAME)).sendKeys(username);
+        return this;
     }
 
     public LoginPage typePassword(String password) {
-        throw new UnsupportedOperationException("TODO: введи пароль у поле password");
+        wait.until(ExpectedConditions.elementToBeClickable(PASSWORD)).sendKeys(password);
+        return this;
     }
 
     public void submit() {
-        throw new UnsupportedOperationException("TODO: натисни login-button");
+        wait.until(ExpectedConditions.elementToBeClickable(LOGIN_BUTTON)).click();
     }
 
     public String errorMessage() {
-        throw new UnsupportedOperationException("TODO: поверни текст помилки з [data-test='error']");
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(ERROR)).getText();
     }
 }
