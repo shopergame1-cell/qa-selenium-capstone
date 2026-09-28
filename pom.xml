@@ -11,6 +11,8 @@
   <name>QA Selenium Capstone</name>
 
   <properties>
+    <!-- Чи вмикати СПРАВЖНЮ паралельність JUnit 5 (Surefire-параметр <parallel> її не вмикає). -->
+    <parallel.enabled>false</parallel.enabled>
     <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <selenium.version>4.25.0</selenium.version>
@@ -64,6 +66,10 @@
               <threadCount>4</threadCount>
               <systemPropertyVariables>
                 <parallel>${parallel}</parallel>
+                <!-- Без цих трьох рядків JUnit 5 ігнорує <parallel> і тести йдуть послідовно. -->
+                <junit.jupiter.execution.parallel.enabled>${parallel.enabled}</junit.jupiter.execution.parallel.enabled>
+                <junit.jupiter.execution.parallel.mode.default>concurrent</junit.jupiter.execution.parallel.mode.default>
+                <junit.jupiter.execution.parallel.mode.classes.default>concurrent</junit.jupiter.execution.parallel.mode.classes.default>
               </systemPropertyVariables>
             </configuration>
           </plugin>

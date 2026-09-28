@@ -38,14 +38,14 @@ jobs:
       - name: Chrome (для headless-прогону)
         run: google-chrome --version || sudo apt-get install -y google-chrome-stable
       - name: Послідовний прогін (має бути зеленим)
-        run: mvn -B test -Pstand -Dparallel=none
+        run: mvn -B test -Pstand -Dparallel=none -Dparallel.enabled=false
       # Паралельний прогін мусить ВПАСТИ — у цьому суть вправи. Але падіння кроку не повинно
       # робити червоним весь прогін: для студента зелений прогін це приймання capstone, і чужий
       # навчальний стенд не має його ламати. Тому крок продовжується, а результат перевіряємо явно.
       - name: Паралельний прогін (тут і має бути червоно)
         id: parallel
         continue-on-error: true
-        run: mvn -B test -Pstand -Dparallel=methods
+        run: mvn -B test -Pstand -Dparallel=methods -Dparallel.enabled=true
       - name: Перевірка, що вправа досі ловить проблему
         run: |
           if [ "${{ steps.parallel.outcome }}" != "failure" ]; then
