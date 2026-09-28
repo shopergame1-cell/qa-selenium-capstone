@@ -24,3 +24,39 @@ jobs:
         if: success()
         run: |
           echo "::notice title=Capstone::Усі тести зелені. Прикріпи посилання на цей прогін як артефакт у курсі."
+
+  stand_practices:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Chrome (для headless-прогону)
+        run: google-chrome --version || sudo apt-get install -y google-chrome-stable
+      - name: Послідовний прогін (має бути зеленим)
+        run: mvn -B test -Pstand -Dparallel=none
+      # Паралельний прогін мусить ВПАСТИ — у цьому суть вправи. Але падіння кроку не повинно
+      # робити червоним весь прогін: для студента зелений прогін це приймання capstone, і чужий
+      # навчальний стенд не має його ламати. Тому крок продовжується, а результат перевіряємо явно.
+      - name: Паралельний прогін (тут і має бути червоно)
+        id: parallel
+        continue-on-error: true
+        run: mvn -B test -Pstand -Dparallel=methods
+      - name: Перевірка, що вправа досі ловить проблему
+        run: |
+          if [ "${{ steps.parallel.outcome }}" != "failure" ]; then
+            echo "::error title=Стенд зламався::паралельний прогін став зеленим — вправа більше нічого не показує, треба полагодити"
+            exit 1
+          fi
+          echo "::notice title=Стенд працює::послідовно зелено, паралельно червоно — рівно те, що потрібно вправі"
+      - name: Завантаження діагностики з падіння
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-artifacts
+          path: target/artifacts/
+          if-no-files-found: warn
