@@ -1,0 +1,13 @@
+# Збірка Maven: класи, звіти Surefire і діагностика з падінь (target/artifacts/)
+target/
+
+# Інструменти розробки
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+
+# Сміття системи
+.DS_Store
+Thumbs.db
