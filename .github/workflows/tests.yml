@@ -37,8 +37,24 @@ jobs:
           cache: maven
       - name: Chrome (для headless-прогону)
         run: google-chrome --version || sudo apt-get install -y google-chrome-stable
+      # FailureCausesTest падає навмисно (це матеріал для практики діагностики), тому з послідовного
+      # прогону його виключено: прогін студента має лишатися зеленим.
       - name: Послідовний прогін (має бути зеленим)
-        run: mvn -B test -Pstand -Dparallel=none -Dparallel.enabled=false
+        run: mvn -B test -Pstand -Dparallel=none -Dparallel.enabled=false -Dtest='!FailureCausesTest'
+      # Тут і має бути червоно: три тести падають ЗАВЖДИ, кожен зі своєї причини (пізній елемент,
+      # змінений текст, помилка від API). Крок не робить червоним увесь прогін, але його результат
+      # перевіряється явно нижче — щоб клас не «полагодили» випадково.
+      - name: Падіння з різних причин (тут теж має бути червоно)
+        id: failures
+        continue-on-error: true
+        run: mvn -B test -Pstand -Dparallel=none -Dparallel.enabled=false -Dtest=FailureCausesTest
+      - name: Перевірка, що три причини падіння досі відтворюються
+        run: |
+          if [ "${{ steps.failures.outcome }}" != "failure" ]; then
+            echo "::error title=Стенд зламався::FailureCausesTest став зеленим — причини падіння більше не відтворюються, вправі нема на чому вчити"
+            exit 1
+          fi
+          echo "::notice title=Діагностика::три різні причини падіння відтворюються — є на чому вчити діагностику"
       # Паралельний прогін мусить ВПАСТИ — у цьому суть вправи. Але падіння кроку не повинно
       # робити червоним весь прогін: для студента зелений прогін це приймання capstone, і чужий
       # навчальний стенд не має його ламати. Тому крок продовжується, а результат перевіряємо явно.
